@@ -1,0 +1,511 @@
+:root {
+    --bg-deep: #07111f;
+    --bg-mid: #13213d;
+    --bg-warm: #f97316;
+    --bg-gold: #ffd166;
+    --surface: rgba(10, 21, 39, 0.68);
+    --surface-strong: rgba(255, 255, 255, 0.1);
+    --surface-soft: rgba(255, 255, 255, 0.07);
+    --text: #eef5ff;
+    --muted: #bcd0eb;
+    --line: rgba(255, 255, 255, 0.15);
+    --accent: #ff8a00;
+    --accent-2: #ffd54f;
+    --accent-3: #51d0ff;
+    --shadow: 0 28px 80px rgba(3, 10, 24, 0.45);
+    --radius-xl: 34px;
+    --radius-lg: 26px;
+    --radius-md: 18px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Outfit", sans-serif;
+    color: var(--text);
+    background:
+        radial-gradient(circle at top left, rgba(81, 208, 255, 0.18), transparent 28%),
+        radial-gradient(circle at 85% 12%, rgba(255, 213, 79, 0.22), transparent 18%),
+        linear-gradient(145deg, #07111f 0%, #0d1d35 36%, #12274a 64%, #1f3b66 100%);
+    overflow-x: hidden;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.85), transparent 90%);
+    pointer-events: none;
+}
+
+.page-glow {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(18px);
+    opacity: 0.58;
+    pointer-events: none;
+}
+
+.page-glow-one {
+    top: -6rem;
+    right: -4rem;
+    width: 22rem;
+    height: 22rem;
+    background: rgba(255, 138, 0, 0.3);
+}
+
+.page-glow-two {
+    left: -5rem;
+    bottom: 10rem;
+    width: 18rem;
+    height: 18rem;
+    background: rgba(81, 208, 255, 0.22);
+}
+
+.sponsor-shell {
+    position: relative;
+    z-index: 1;
+    width: min(1200px, calc(100% - 2rem));
+    margin: 0 auto;
+    padding: 2rem 0 4rem;
+}
+
+.top-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-bottom: 1.25rem;
+    padding: 0.75rem;
+    border-radius: 999px;
+    background: rgba(6, 16, 31, 0.56);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(20px);
+}
+
+.nav-brand,
+.nav-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0.85rem 1.35rem;
+    border-radius: 999px;
+    color: #eef5ff;
+    text-decoration: none;
+    font-size: 0.96rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+
+.nav-brand {
+    min-width: 88px;
+    color: #091426;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    background: linear-gradient(135deg, rgba(255, 213, 79, 0.96), rgba(255, 138, 0, 0.96));
+    border-color: transparent;
+}
+
+.nav-tab:hover,
+.nav-tab:focus-visible,
+.nav-brand:hover,
+.nav-brand:focus-visible {
+    transform: translateY(-1px);
+}
+
+.nav-tab:hover,
+.nav-tab:focus-visible {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.24);
+    color: #ffffff;
+}
+
+.nav-brand:hover,
+.nav-brand:focus-visible {
+    background: linear-gradient(135deg, rgba(255, 225, 110, 1), rgba(255, 157, 0, 1));
+    color: #091426;
+}
+
+.nav-tab-accent {
+    background: linear-gradient(135deg, rgba(255, 138, 0, 0.92), rgba(255, 213, 79, 0.92));
+    color: #18243a;
+    border-color: transparent;
+}
+
+.nav-tab-accent:hover,
+.nav-tab-accent:focus-visible {
+    background: linear-gradient(135deg, rgba(255, 157, 0, 1), rgba(255, 225, 110, 1));
+    color: #0f1a2d;
+}
+
+.hero-panel,
+.prize-card,
+.contact-panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(20px);
+}
+
+.hero-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(300px, 0.8fr);
+    gap: 1.5rem;
+    padding: 2rem;
+    border-radius: var(--radius-xl);
+}
+
+.eyebrow,
+.contact-label {
+    margin: 0 0 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--accent-2);
+}
+
+h1,
+h2,
+h3,
+p {
+    margin-top: 0;
+}
+
+h1,
+h2,
+.hero-card h2 {
+    font-family: "Bebas Neue", sans-serif;
+    letter-spacing: 0.03em;
+}
+
+h1 {
+    margin-bottom: 0.75rem;
+    font-size: clamp(4rem, 10vw, 7.6rem);
+    line-height: 0.88;
+}
+
+.hero-text,
+.hero-card p,
+.prize-copy p,
+.contact-copy p,
+.contact-card p,
+.privacy-note {
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+.marathi-line {
+    font-family: "Noto Sans Devanagari", "Outfit", sans-serif;
+    color: #f9dca1;
+    font-size: 0.98rem;
+    line-height: 1.7;
+}
+
+.hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.hero-tags span {
+    padding: 0.75rem 1rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff2c4;
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
+.hero-card {
+    align-self: stretch;
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06)),
+        linear-gradient(160deg, rgba(255, 138, 0, 0.18), rgba(81, 208, 255, 0.12));
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.hero-logo {
+    width: 88px;
+    height: 88px;
+    object-fit: contain;
+    padding: 0.6rem;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
+}
+
+.hero-card-label {
+    margin: 1.25rem 0 0.35rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #ffe082;
+}
+
+.hero-card h2 {
+    margin-bottom: 0.85rem;
+    font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.prize-grid {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.prize-card {
+    display: grid;
+    grid-template-columns: minmax(240px, 340px) minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: center;
+    padding: 1.6rem;
+    border-radius: var(--radius-xl);
+}
+
+.prize-card-secondary {
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 340px);
+}
+
+.prize-card-primary {
+    background:
+        linear-gradient(135deg, rgba(255, 157, 0, 0.18), rgba(7, 17, 31, 0.72)),
+        var(--surface);
+}
+
+.prize-card-secondary {
+    background:
+        linear-gradient(225deg, rgba(81, 208, 255, 0.14), rgba(7, 17, 31, 0.72)),
+        var(--surface);
+}
+
+.prize-media {
+    position: relative;
+}
+
+.image-placeholder {
+    min-height: 280px;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    gap: 0.4rem;
+    padding: 1.5rem;
+    border-radius: 28px;
+    background:
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.16), transparent 40%),
+        linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+    border: 1px dashed rgba(255, 255, 255, 0.28);
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+}
+
+.image-placeholder > * {
+    position: relative;
+    z-index: 1;
+}
+
+.image-placeholder::before {
+    content: "01";
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 4rem;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.08);
+}
+
+.image-placeholder::after {
+    content: "?";
+    position: absolute;
+    bottom: 1.1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #ff4b4b;
+    color: #fff;
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 2.1rem;
+    line-height: 1;
+    box-shadow: 0 12px 28px rgba(255, 75, 75, 0.35);
+}
+
+.prize-card-secondary .image-placeholder::before {
+    content: "02";
+}
+
+.image-placeholder span {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.image-placeholder small {
+    color: #d7e9ff;
+    font-size: 0.95rem;
+}
+
+.image-placeholder small::after {
+    content: " No sponsor till now.";
+    display: block;
+    margin-top: 0.9rem;
+    color: #ffb8b8;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.prize-copy h2,
+.contact-copy h2 {
+    margin-bottom: 0.75rem;
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+}
+
+.support-line {
+    margin-top: 1rem;
+    color: #ffe4a8;
+    font-weight: 600;
+}
+
+.contact-panel {
+    margin-top: 1.5rem;
+    padding: 2rem;
+    border-radius: var(--radius-xl);
+    background:
+        radial-gradient(circle at top right, rgba(255, 213, 79, 0.12), transparent 22%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03)),
+        var(--surface);
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.contact-card {
+    padding: 1.4rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface-soft);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.contact-card h3 {
+    margin-bottom: 0.65rem;
+    font-size: 1.35rem;
+}
+
+.contact-card a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.contact-card a:hover,
+.contact-card a:focus-visible {
+    color: #ffe082;
+}
+
+.privacy-note {
+    margin: 1.5rem 0 0;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    font-size: 0.96rem;
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 650ms ease, transform 650ms ease;
+}
+
+.reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@media (max-width: 920px) {
+    .hero-panel,
+    .prize-card,
+    .prize-card-secondary {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .sponsor-shell {
+        width: min(100% - 1rem, 100%);
+        padding-top: 1rem;
+    }
+
+    .top-nav {
+        flex-direction: column;
+        align-items: stretch;
+        border-radius: 24px;
+    }
+
+    .nav-brand,
+    .nav-tab {
+        width: 100%;
+    }
+
+    .hero-panel,
+    .prize-card,
+    .contact-panel {
+        padding: 1.2rem;
+        border-radius: 24px;
+    }
+
+    h1 {
+        font-size: clamp(3.4rem, 18vw, 5rem);
+    }
+
+    .prize-copy h2,
+    .contact-copy h2 {
+        font-size: clamp(2rem, 10vw, 3rem);
+    }
+
+    .image-placeholder {
+        min-height: 220px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}

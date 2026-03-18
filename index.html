@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DPL Player Registration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="page-shell">
+        <nav class="top-nav" aria-label="Primary">
+            <a href="https://sites.google.com/view/dpl2026/home/new-season-coming" class="nav-brand">DPL Season 3</a>
+            <a href="sponsorship.html" class="nav-tab">Sponsor Spotlight</a>
+        </nav>
+
+        <section class="hero">
+            <div class="hero-copy">
+                <h1>Cricket Registration</h1>
+            </div>
+        </section>
+
+        <section class="form-wrapper">
+            <div class="form-header">
+                <div>
+                    <p class="section-tag">Registration Form</p>
+                    <h2>Complete your DPL player details</h2>
+                </div>
+                <div class="progress-block">
+                    <span class="progress-label">Completion</span>
+                    <strong id="progressText">0%</strong>
+                    <div class="progress-track" aria-hidden="true">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <form id="form" novalidate>
+                <div class="form-grid">
+                    <section class="form-section">
+                        <p class="field-tag">Step 1</p>
+                        <h3>Participation (सहभाग)</h3>
+                        <div class="choice-grid two-col">
+                            <label class="choice-card">
+                                <input type="radio" name="play" value="Yes" required>
+                                <span>Yes, I want to play in DPL</span>
+                            </label>
+                            <label class="choice-card">
+                                <input type="radio" name="play" value="No" required>
+                                <span>No, I am not participating</span>
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="form-section">
+                        <p class="field-tag">Step 2</p>
+                        <h3>Preferred date (प्राधान्य दिनांक)</h3>
+                        <div class="choice-grid two-col">
+                            <label class="choice-card">
+                                <input type="radio" name="date" value="3-5 April" required>
+                                <span>3-5 April</span>
+                            </label>
+                            <label class="choice-card">
+                                <input type="radio" name="date" value="10-12 April" required>
+                                <span>10-12 April</span>
+                            </label>
+                            <label class="choice-card">
+                                <input type="radio" name="date" value="1-3 May" required>
+                                <span>1-3 May</span>
+                            </label>
+                            <label class="choice-card">
+                                <input type="radio" name="date" value="After 1 May" required>
+                                <span>After 1 May</span>
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="form-section">
+                        <p class="field-tag">Step 3</p>
+                        <h3>Preferred team (प्राधान्य संघ)</h3>
+                        <div class="choice-grid two-col">
+                            <label class="choice-card">
+                                <input type="radio" name="team" value="AP 11" required>
+                                <span>AP 11</span>
+                            </label>
+                            <label class="choice-card">
+                                <input type="radio" name="team" value="Cotton 11" required>
+                                <span>Cotton 11</span>
+                            </label>
+                            <label class="choice-card">
+                                <input type="radio" name="team" value="Ankush Raj 11" required>
+                                <span>Ankush Raj 11</span>
+                            </label>
+                            <label class="choice-card">
+                                <input type="radio" name="team" value="Ajinkya Classes 11" required>
+                                <span>Ajinkya Classes 11</span>
+                            </label>
+                            <label class="choice-card">
+                                <input type="radio" name="team" value="Balakrishna 11" required>
+                                <span>Balakrishna 11</span>
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="form-section wide">
+                        <p class="field-tag">Step 4</p>
+                        <h3>Player details</h3>
+                        <div class="input-grid">
+                            <label class="input-field">
+                                <span>Full name</span>
+                                <input type="text" name="name" id="name" placeholder="Enter full name" required>
+                            </label>
+                            <label class="input-field">
+                                <span>Mobile</span>
+                                <input type="tel" name="mobile" id="mobile" placeholder="Enter mobile number" inputmode="numeric" required>
+                            </label>
+                            <label class="input-field">
+                                <span>Age</span>
+                                <input type="number" name="age" id="age" min="10" max="60" placeholder="Enter age" required>
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="form-section">
+                        <p class="field-tag">Step 5</p>
+                        <h3>Playing role</h3>
+                        <div class="choice-grid four-col">
+                            <label class="choice-card">
+                                <input type="radio" name="role" value="Batsman" required>
+                                <span>Batsman</span>
+                            </label>
+                            <label class="choice-card">
+                                <input type="radio" name="role" value="Bowler" required>
+                                <span>Bowler</span>
+                            </label>
+                            <label class="choice-card">
+                                <input type="radio" name="role" value="All-rounder" required>
+                                <span>All-rounder</span>
+                            </label>
+                            <label class="choice-card">
+                                <input type="radio" name="role" value="Umpire" required>
+                                <span>Umpire</span>
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="form-section">
+                        <p class="field-tag">Step 6</p>
+                        <h3>Jersey number (जर्सी क्रमांक)</h3>
+                        <label class="input-field">
+                            <span>Enter your jersey number</span>
+                            <input type="number" name="jerseyNumber" id="jerseyNumber" min="0" max="999" placeholder="Example: 7 or 10" required>
+                        </label>
+                    </section>
+
+                    <section class="form-section">
+                        <p class="field-tag">Step 7</p>
+                        <h3>Registration fee</h3>
+                        <div class="choice-grid three-col">
+                            <label class="choice-card">
+                                <input type="radio" name="fee" value="Free" required>
+                                <span>Free</span>
+                            </label>
+                            <label class="choice-card">
+                                <input type="radio" name="fee" value="Rs 10-Rs 20" required>
+                                <span>Rs 10-Rs 20</span>
+                            </label>
+                            <label class="choice-card">
+                                <input type="radio" name="fee" value="More than Rs 50" required>
+                                <span>More than Rs 50</span>
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="form-section">
+                        <p class="field-tag">Step 8</p>
+                        <h3>Remarks</h3>
+                        <label class="input-field">
+                            <span>Additional notes</span>
+                            <textarea name="remarks" id="remarks" rows="5" placeholder="Share anything important for the organizers"></textarea>
+                        </label>
+                    </section>
+                </div>
+
+                <div class="form-footer">
+                    <p class="helper-text" id="statusMessage">Fill in the form to preview your registration summary.</p>
+                    <div class="action-row">
+                        <button type="reset" class="secondary-btn">Reset</button>
+                        <button type="submit" class="primary-btn">Submit registration</button>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <section class="hero-panel snapshot-panel">
+            <p class="panel-kicker">Live Snapshot</p>
+            <div class="summary-card" id="summaryCard">
+                <div class="summary-line">
+                    <span>Player</span>
+                    <strong id="summaryName">Not entered</strong>
+                </div>
+                <div class="summary-line">
+                    <span>Mobile</span>
+                    <strong id="summaryMobile">Not entered</strong>
+                </div>
+                <div class="summary-line">
+                    <span>Team</span>
+                    <strong id="summaryTeam">Not selected</strong>
+                </div>
+                <div class="summary-line">
+                    <span>Role</span>
+                    <strong id="summaryRole">Not selected</strong>
+                </div>
+                <div class="summary-line">
+                    <span>Fee</span>
+                    <strong id="summaryFee">Pending</strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="download-panel hidden" id="downloadPanel">
+            <div class="download-card" id="downloadCard">
+                <p class="panel-kicker">Live Snapshot</p>
+                <div class="pass-card" id="passCard">
+                    <div class="pass-topline"></div>
+                    <div class="pass-top">
+                        <div class="pass-brand">
+                            <img src="logo.png" alt="DPL logo" class="pass-logo">
+                            <div>
+                                <p class="pass-mini">DPL Cricket</p>
+                                <h2 id="receiptHeading">Player Pass 2026</h2>
+                            </div>
+                        </div>
+                        <div class="pass-side">
+                            <div class="pass-chip">Welcome To Cricket Festival</div>
+                            <div class="pass-id-stack">
+                                <span class="pass-id-title">Unique ID</span>
+                                <div class="pass-barcode" id="receiptBarcode" aria-hidden="true"></div>
+                                <strong id="receiptId">260000</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pass-stage">
+                        <div class="pass-details">
+                            <div class="pass-name" id="receiptName">-</div>
+                            <div class="pass-data-list">
+                                <div class="pass-data-row"><span>Mobile</span><strong id="receiptMobile">-</strong></div>
+                                <div class="pass-data-row"><span>Team</span><strong id="receiptTeam">-</strong></div>
+                                <div class="pass-data-row"><span>Role</span><strong id="receiptRole">-</strong></div>
+                            </div>
+                            <div class="pass-footer-bar">
+                                <div class="pass-footer-item"><span>Jersey:</span><strong id="receiptJerseyNumber">-</strong></div>
+                            </div>
+                        </div>
+                        <div class="pass-map">
+                            <div class="pass-map-outline"><span>Deshgavhan</span></div>
+                        </div>
+                    </div>
+                    <p class="pass-note">VALID FOR DPL CRICKET TOURNAMENT</p>
+                </div>
+                <div class="download-actions">
+                    <button type="button" class="secondary-btn" id="downloadButton">Download Your Pass</button>
+                </div>
+                <div class="format-options" id="formatOptions">
+                    <button type="button" class="format-btn" data-format="pdf">PDF</button>
+                    <button type="button" class="format-btn" data-format="jpg">JPG</button>
+                    <button type="button" class="format-btn" data-format="html">HTML</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
