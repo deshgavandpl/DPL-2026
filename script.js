@@ -6,6 +6,10 @@ const submitButton = form.querySelector('button[type="submit"]');
 const downloadPanel = document.getElementById("downloadPanel");
 const downloadButton = document.getElementById("downloadButton");
 const formatButtons = document.querySelectorAll(".format-btn");
+const basePriceInput = document.getElementById("basePrice");
+const feeInput = document.getElementById("fee");
+const calculatedFee = document.getElementById("calculatedFee");
+const BROCHURE_PDF_PATH = "dpl.pdf";
 let currentDplId = "";
 
 const summaryMap = {
@@ -13,6 +17,7 @@ const summaryMap = {
     mobile: document.getElementById("summaryMobile"),
     team: document.getElementById("summaryTeam"),
     role: document.getElementById("summaryRole"),
+    basePrice: document.getElementById("summaryBasePrice"),
     fee: document.getElementById("summaryFee")
 };
 
@@ -22,7 +27,9 @@ const receiptMap = {
     mobile: document.getElementById("receiptMobile"),
     team: document.getElementById("receiptTeam"),
     role: document.getElementById("receiptRole"),
-    jerseyNumber: document.getElementById("receiptJerseyNumber")
+    basePrice: document.getElementById("receiptBasePrice"),
+    jerseyNumber: document.getElementById("receiptJerseyNumber"),
+    fee: document.getElementById("receiptFee")
 };
 
 const requiredFields = [
@@ -32,6 +39,7 @@ const requiredFields = [
     "name",
     "mobile",
     "age",
+    "basePrice",
     "role",
     "jerseyNumber",
     "fee"
@@ -50,11 +58,14 @@ function readValue(name) {
 }
 
 function getFormSnapshot() {
+    const basePriceValue = Number(readValue("basePrice"));
+
     return {
         id: currentDplId || "0000",
         name: readValue("name") || "Not entered",
         mobile: readValue("mobile") || "Not entered",
         age: readValue("age") || "Not entered",
+        basePrice: Number.isFinite(basePriceValue) && basePriceValue > 0 ? formatCurrency(basePriceValue) : "Not entered",
         play: readValue("play") || "Not selected",
         date: readValue("date") || "Not selected",
         team: readValue("team") || "Not selected",
@@ -69,6 +80,26 @@ function generateDplId() {
     return `000026${mobile.slice(-4) || "0000"}`;
 }
 
+function formatCurrency(amount) {
+    return `Rs ${amount.toFixed(2)}`;
+}
+
+function updateCalculatedFee() {
+    const basePrice = Number(readValue("basePrice"));
+
+    if (!Number.isFinite(basePrice) || basePrice <= 0) {
+        feeInput.value = "";
+        calculatedFee.textContent = "Enter base price first";
+        return;
+    }
+
+    const feeAmount = basePrice * 0.25;
+    const formattedFee = formatCurrency(feeAmount);
+
+    feeInput.value = formattedFee;
+    calculatedFee.textContent = `${formattedFee} registration fee to be paid`;
+}
+
 function updateSummary() {
     const snapshot = getFormSnapshot();
 
@@ -76,7 +107,8 @@ function updateSummary() {
     summaryMap.mobile.textContent = snapshot.mobile;
     summaryMap.team.textContent = snapshot.team;
     summaryMap.role.textContent = snapshot.role;
-    summaryMap.fee.textContent = snapshot.fee;
+    summaryMap.basePrice.textContent = snapshot.basePrice;
+    summaryMap.fee.textContent = snapshot.basePrice;
 }
 
 function updateProgress() {
@@ -96,6 +128,10 @@ function populateReceipt() {
         }
     });
 
+    if (receiptMap.fee) {
+        receiptMap.fee.textContent = snapshot.basePrice;
+    }
+
     renderBarcode(snapshot.id, document.getElementById("receiptBarcode"));
 }
 
@@ -103,6 +139,7 @@ function validateForm() {
     const name = readValue("name");
     const mobile = readValue("mobile");
     const age = Number(readValue("age"));
+    const basePrice = Number(readValue("basePrice"));
     const jerseyNumber = Number(readValue("jerseyNumber"));
 
     if (!form.checkValidity()) {
@@ -129,6 +166,12 @@ function validateForm() {
         return false;
     }
 
+    if (!Number.isFinite(basePrice) || basePrice <= 0) {
+        statusMessage.textContent = "Base price should be greater than 0.";
+        statusMessage.className = "helper-text error";
+        return false;
+    }
+
     if (!Number.isFinite(jerseyNumber) || jerseyNumber < 0 || jerseyNumber > 999) {
         statusMessage.textContent = "Jersey number should be between 0 and 999.";
         statusMessage.className = "helper-text error";
@@ -141,6 +184,7 @@ function validateForm() {
 }
 
 function refreshUI() {
+    updateCalculatedFee();
     updateSummary();
     updateProgress();
 
@@ -181,8 +225,21 @@ function traceRoundedRect(context, x, y, width, height, radius) {
     context.closePath();
 }
 
-function getSafeName(snapshot) {
-    return snapshot.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "player";
+function getDownloadFilename(extension) {
+    return `DPL Pass.${extension}`;
+}
+
+function triggerFileDownload(url, filename) {
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+}
+
+function downloadBrochurePdf() {
+    triggerFileDownload(BROCHURE_PDF_PATH, "dpl.pdf");
 }
 
 function getBarcodePattern(value) {
@@ -211,124 +268,6 @@ function renderBarcode(value, element) {
         bar.style.height = `${height}px`;
         element.appendChild(bar);
     });
-}
-
-function dataUrlToUint8Array(dataUrl) {
-    const base64 = dataUrl.split(",")[1] || "";
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-
-    for (let index = 0; index < binary.length; index += 1) {
-        bytes[index] = binary.charCodeAt(index);
-    }
-
-    return bytes;
-}
-
-function buildPdfFromJpegDataUrl(dataUrl, imageWidth, imageHeight) {
-    const jpegBytes = dataUrlToUint8Array(dataUrl);
-    const pageWidth = 842;
-    const pageHeight = 595;
-    const margin = 20;
-    const maxWidth = pageWidth - margin * 2;
-    const maxHeight = pageHeight - margin * 2;
-    const imageRatio = imageWidth / imageHeight;
-    let drawWidth = maxWidth;
-    let drawHeight = drawWidth / imageRatio;
-
-    if (drawHeight > maxHeight) {
-        drawHeight = maxHeight;
-        drawWidth = drawHeight * imageRatio;
-    }
-
-    const drawX = (pageWidth - drawWidth) / 2;
-    const drawY = (pageHeight - drawHeight) / 2;
-
-    const objects = [];
-    const encoder = new TextEncoder();
-
-    const contentStream = `q\n${drawWidth.toFixed(2)} 0 0 ${drawHeight.toFixed(2)} ${drawX.toFixed(2)} ${drawY.toFixed(2)} cm\n/Im0 Do\nQ`;
-
-    objects.push(encoder.encode("<< /Type /Catalog /Pages 2 0 R >>"));
-    objects.push(encoder.encode("<< /Type /Pages /Kids [3 0 R] /Count 1 >>"));
-    objects.push(encoder.encode(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>`));
-    objects.push({
-        header: encoder.encode(`<< /Type /XObject /Subtype /Image /Width ${imageWidth} /Height ${imageHeight} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpegBytes.length} >>`),
-        stream: jpegBytes
-    });
-    objects.push({
-        header: encoder.encode(`<< /Length ${encoder.encode(contentStream).length} >>`),
-        stream: encoder.encode(contentStream)
-    });
-
-    const chunks = [];
-    const offsets = [0];
-    let position = 0;
-
-    function pushBytes(bytes) {
-        chunks.push(bytes);
-        position += bytes.length;
-    }
-
-    pushBytes(encoder.encode("%PDF-1.4\n%\u00e2\u00e3\u00cf\u00d3\n"));
-
-    objects.forEach((object, index) => {
-        offsets.push(position);
-        pushBytes(encoder.encode(`${index + 1} 0 obj\n`));
-
-        if (object instanceof Uint8Array) {
-            pushBytes(object);
-            pushBytes(encoder.encode("\nendobj\n"));
-            return;
-        }
-
-        pushBytes(object.header);
-        pushBytes(encoder.encode("\nstream\n"));
-        pushBytes(object.stream);
-        pushBytes(encoder.encode("\nendstream\nendobj\n"));
-    });
-
-    const xrefOffset = position;
-    pushBytes(encoder.encode(`xref\n0 ${objects.length + 1}\n`));
-    pushBytes(encoder.encode("0000000000 65535 f \n"));
-
-    offsets.slice(1).forEach((offset) => {
-        pushBytes(encoder.encode(`${String(offset).padStart(10, "0")} 00000 n \n`));
-    });
-
-    pushBytes(encoder.encode(`trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`));
-
-    return new Blob(chunks, { type: "application/pdf" });
-}
-
-async function showSaveDialog(suggestedName, accept) {
-    if (!window.showSaveFilePicker) {
-        return null;
-    }
-
-    try {
-        return await window.showSaveFilePicker({
-            suggestedName,
-            types: [
-                {
-                    description: "DPL Pass",
-                    accept
-                }
-            ]
-        });
-    } catch (error) {
-        if (error && typeof error === "object" && "name" in error && error.name === "AbortError") {
-            return "aborted";
-        }
-
-        return null;
-    }
-}
-
-async function saveBlobWithHandle(fileHandle, blob) {
-    const writable = await fileHandle.createWritable();
-    await writable.write(blob);
-    await writable.close();
 }
 
 function drawFittedText(context, text, x, y, maxWidth, options = {}) {
@@ -435,12 +374,12 @@ function buildPassCanvas(snapshot) {
 
     context.strokeStyle = "rgba(255, 193, 94, 0.92)";
     context.lineWidth = 8;
-    traceRoundedRect(context, 40, 40, 1520, 920, 54);
+    traceRoundedRect(context, 40, 40, 1520, 920, 72);
     context.stroke();
 
     context.lineWidth = 3;
     context.strokeStyle = "rgba(255, 193, 94, 0.45)";
-    traceRoundedRect(context, 90, 90, 1420, 820, 38);
+    traceRoundedRect(context, 90, 90, 1420, 820, 54);
     context.stroke();
 
     if (logo && logo.complete && logo.naturalWidth > 0) {
@@ -456,7 +395,7 @@ function buildPassCanvas(snapshot) {
     });
 
     context.fillStyle = "rgba(213, 99, 22, 0.95)";
-    fillRoundedRect(context, 1120, 98, 360, 82, 24);
+    fillRoundedRect(context, 1120, 98, 360, 82, 41);
     drawFittedText(context, "WELCOME TO CRICKET FESTIVAL", 1118, 149, 330, {
         initialSize: 28,
         minSize: 18,
@@ -464,7 +403,7 @@ function buildPassCanvas(snapshot) {
     });
 
     context.fillStyle = "rgba(66, 18, 10, 0.72)";
-    fillRoundedRect(context, 1145, 180, 290, 132, 22);
+    fillRoundedRect(context, 1145, 180, 290, 132, 32);
     drawFittedText(context, "UNIQUE ID", 1172, 208, 160, {
         initialSize: 18,
         minSize: 14,
@@ -486,7 +425,8 @@ function buildPassCanvas(snapshot) {
 
     context.strokeStyle = "rgba(255, 170, 84, 0.55)";
     context.lineWidth = 2;
-    context.strokeRect(90, 220, 1400, 560);
+    traceRoundedRect(context, 90, 220, 1400, 560, 34);
+    context.stroke();
 
     drawFittedText(context, String(snapshot.name).toUpperCase(), 285, 320, 720, {
         initialSize: 74,
@@ -502,11 +442,11 @@ function buildPassCanvas(snapshot) {
 
     let rowY = 470;
     rows.forEach(([label, value]) => {
-        context.strokeStyle = "rgba(255, 169, 82, 0.5)";
+        context.fillStyle = "rgba(255, 240, 210, 0.05)";
+        fillRoundedRect(context, 120, rowY - 62, 810, 74, 20);
+        context.strokeStyle = "rgba(255, 169, 82, 0.35)";
         context.lineWidth = 2;
-        context.beginPath();
-        context.moveTo(120, rowY - 56);
-        context.lineTo(930, rowY - 56);
+        traceRoundedRect(context, 120, rowY - 62, 810, 74, 20);
         context.stroke();
 
         drawFittedText(context, label, 150, rowY, 150, {
@@ -522,18 +462,12 @@ function buildPassCanvas(snapshot) {
         rowY += 95;
     });
 
-    context.beginPath();
-    context.moveTo(1050, 260);
-    context.lineTo(1110, 330);
-    context.lineTo(1205, 342);
-    context.lineTo(1390, 300);
-    context.lineTo(1346, 598);
-    context.lineTo(1136, 610);
-    context.lineTo(1018, 630);
-    context.closePath();
+    context.fillStyle = "rgba(255, 240, 210, 0.06)";
+    fillRoundedRect(context, 1018, 280, 360, 320, 40);
     context.strokeStyle = "rgba(255, 162, 78, 0.95)";
     context.lineWidth = 6;
-    context.setLineDash([10, 8]);
+    context.setLineDash([14, 10]);
+    traceRoundedRect(context, 1018, 280, 360, 320, 40);
     context.stroke();
     context.setLineDash([]);
     drawFittedText(context, "Deshgavhan", 1150, 520, 200, {
@@ -569,14 +503,14 @@ function buildPassCanvas(snapshot) {
     return canvas;
 }
 
-function openImageWindow(dataUrl, title) {
-    const imageWindow = window.open("", "_blank");
+function openDocumentWindow(title, bodyMarkup, extraStyles = "") {
+    const docWindow = window.open("", "_blank");
 
-    if (!imageWindow) {
+    if (!docWindow) {
         return null;
     }
 
-    imageWindow.document.write(`
+    docWindow.document.write(`
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -586,132 +520,49 @@ function openImageWindow(dataUrl, title) {
             <style>
                 body {
                     margin: 0;
-                    padding: 20px;
-                    background: #f4f4f4;
-                    display: grid;
-                    place-items: center;
-                    min-height: 100vh;
+                    padding: 24px;
+                    background: #111;
+                    color: #fff;
+                    font-family: Arial, sans-serif;
                 }
-                .sheet {
-                    width: min(100%, 1000px);
+                .wrap {
+                    max-width: 1100px;
+                    margin: 0 auto;
                 }
-                img {
-                    display: block;
-                    width: 100%;
-                    height: auto;
-                    border-radius: 18px;
-                    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+                .actions {
+                    display: flex;
+                    gap: 12px;
+                    flex-wrap: wrap;
+                    margin-bottom: 16px;
                 }
-                @page {
-                    size: A4;
-                    margin: 10mm;
+                button {
+                    border: 0;
+                    border-radius: 999px;
+                    padding: 12px 18px;
+                    font: inherit;
+                    font-weight: 700;
+                    cursor: pointer;
                 }
-                @media print {
-                    body {
-                        padding: 0;
-                        background: #ffffff;
-                    }
-                    .sheet {
-                        width: 100%;
-                    }
-                    img {
-                        border-radius: 0;
-                        box-shadow: none;
-                    }
+                .primary {
+                    background: #ffd062;
+                    color: #2a0d08;
                 }
+                .hint {
+                    margin: 0 0 12px;
+                    color: rgba(255,255,255,0.82);
+                }
+                ${extraStyles}
             </style>
         </head>
         <body>
-            <div class="sheet">
-                <img src="${dataUrl}" alt="DPL pass">
+            <div class="wrap">
+                ${bodyMarkup}
             </div>
         </body>
         </html>
     `);
-    imageWindow.document.close();
-    return imageWindow;
-}
-
-function printDataUrlAsPdf(dataUrl, title) {
-    const iframe = document.createElement("iframe");
-
-    iframe.style.position = "fixed";
-    iframe.style.width = "0";
-    iframe.style.height = "0";
-    iframe.style.border = "0";
-    iframe.style.right = "0";
-    iframe.style.bottom = "0";
-    iframe.setAttribute("aria-hidden", "true");
-    document.body.appendChild(iframe);
-
-    const frameWindow = iframe.contentWindow;
-    const doc = frameWindow?.document;
-
-    if (!frameWindow || !doc) {
-        iframe.remove();
-        return false;
-    }
-
-    doc.open();
-    doc.write(`
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>${title}</title>
-            <style>
-                body {
-                    margin: 0;
-                    padding: 0;
-                    background: #ffffff;
-                    display: grid;
-                    place-items: center;
-                    min-height: 100vh;
-                }
-                img {
-                    display: block;
-                    width: 100%;
-                    max-width: 1100px;
-                    height: auto;
-                }
-                @page {
-                    size: A4 landscape;
-                    margin: 8mm;
-                }
-            </style>
-        </head>
-        <body>
-            <img src="${dataUrl}" alt="DPL pass">
-        </body>
-        </html>
-    `);
-    doc.close();
-
-    window.setTimeout(() => {
-        frameWindow.focus();
-        frameWindow.print();
-        window.setTimeout(() => {
-            iframe.remove();
-        }, 1500);
-    }, 250);
-
-    return true;
-}
-
-function downloadBlob(blob, filename) {
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-
-    window.setTimeout(() => {
-        URL.revokeObjectURL(url);
-    }, 1500);
+    docWindow.document.close();
+    return docWindow;
 }
 
 async function downloadPdf(snapshot) {
@@ -723,29 +574,39 @@ async function downloadPdf(snapshot) {
         return;
     }
 
-    const safeName = getSafeName(snapshot);
-    const saveTarget = await showSaveDialog(`dpl-registration-pass-${safeName}.pdf`, {
-        "application/pdf": [".pdf"]
-    });
-
-    if (saveTarget === "aborted") {
-        statusMessage.textContent = "PDF save cancelled.";
-        statusMessage.className = "helper-text";
-        return;
-    }
-
+    const filename = getDownloadFilename("pdf");
+    downloadBrochurePdf();
     const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
-    const pdfBlob = buildPdfFromJpegDataUrl(dataUrl, canvas.width, canvas.height);
+    const preview = openDocumentWindow(
+        "DPL Pass PDF",
+        `
+            <p class="hint">Use Print or Save as PDF from this page.</p>
+            <div class="actions">
+                <button class="primary" onclick="window.print()">Print / Save PDF</button>
+            </div>
+            <img src="${dataUrl}" alt="DPL pass" style="display:block;width:100%;height:auto;border-radius:18px;box-shadow:0 18px 40px rgba(0,0,0,0.3);background:#fff;">
+        `,
+        `
+            @page {
+                size: A4 landscape;
+                margin: 8mm;
+            }
+            @media print {
+                body { background: #fff; padding: 0; }
+                .actions, .hint { display: none; }
+                img { border-radius: 0 !important; box-shadow: none !important; }
+            }
+        `
+    );
 
-    if (saveTarget) {
-        await saveBlobWithHandle(saveTarget, pdfBlob);
-        statusMessage.textContent = "PDF pass saved successfully.";
-        statusMessage.className = "helper-text success";
+    if (!preview) {
+        statusMessage.textContent = "Could not open the PDF preview. Allow pop-ups and try again.";
+        statusMessage.className = "helper-text error";
         return;
     }
 
-    downloadBlob(pdfBlob, `dpl-registration-pass-${safeName}.pdf`);
-    statusMessage.textContent = "PDF pass download started.";
+    preview.document.title = filename;
+    statusMessage.textContent = "DPL PDF download started and the pass PDF preview opened.";
     statusMessage.className = "helper-text success";
 }
 
@@ -758,346 +619,63 @@ async function downloadJpg(snapshot) {
         return;
     }
 
-    const safeName = getSafeName(snapshot);
-    const filename = `dpl-registration-pass-${safeName}.jpg`;
-    const saveTarget = await showSaveDialog(filename, {
-        "image/jpeg": [".jpg", ".jpeg"]
-    });
-
-    if (saveTarget === "aborted") {
-        statusMessage.textContent = "JPG save cancelled.";
-        statusMessage.className = "helper-text";
-        return;
-    }
-
-    if (canvas.toBlob) {
-        canvas.toBlob(async (blob) => {
-            if (!blob) {
-                statusMessage.textContent = "Could not generate the JPG file.";
-                statusMessage.className = "helper-text error";
-                return;
-            }
-
-            if (saveTarget) {
-                await saveBlobWithHandle(saveTarget, blob);
-                statusMessage.textContent = "JPG pass saved successfully.";
-                statusMessage.className = "helper-text success";
-                return;
-            }
-
-            downloadBlob(blob, filename);
-            statusMessage.textContent = "JPG pass download started.";
-            statusMessage.className = "helper-text success";
-        }, "image/jpeg", 0.95);
-        return;
-    }
-
+    const filename = getDownloadFilename("jpg");
+    downloadBrochurePdf();
     const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+    const preview = openDocumentWindow(
+        "DPL Pass JPG",
+        `
+            <p class="hint">Use Save Image As or the button below.</p>
+            <div class="actions">
+                <a href="${dataUrl}" download="${filename}" style="text-decoration:none;">
+                    <button class="primary">Save JPG</button>
+                </a>
+            </div>
+            <img src="${dataUrl}" alt="DPL pass" style="display:block;width:100%;height:auto;border-radius:18px;box-shadow:0 18px 40px rgba(0,0,0,0.3);">
+        `
+    );
 
-    if (saveTarget) {
-        const fallbackBlob = new Blob([dataUrlToUint8Array(dataUrl)], { type: "image/jpeg" });
-        await saveBlobWithHandle(saveTarget, fallbackBlob);
-        statusMessage.textContent = "JPG pass saved successfully.";
-        statusMessage.className = "helper-text success";
+    if (!preview) {
+        statusMessage.textContent = "Could not open the JPG preview. Allow pop-ups and try again.";
+        statusMessage.className = "helper-text error";
         return;
     }
 
-    const fallbackLink = document.createElement("a");
-    fallbackLink.href = dataUrl;
-    fallbackLink.download = filename;
-    document.body.appendChild(fallbackLink);
-    fallbackLink.click();
-    fallbackLink.remove();
-
-    statusMessage.textContent = "JPG pass download started.";
+    preview.document.title = filename;
+    statusMessage.textContent = "DPL PDF download started and the pass JPG preview opened.";
     statusMessage.className = "helper-text success";
 }
 
 function downloadHtml(snapshot) {
     const logo = document.querySelector(".pass-logo");
     const logoSrc = logo ? logo.src : "";
-    const safeName = getSafeName(snapshot);
+    const filename = getDownloadFilename("html");
+    downloadBrochurePdf();
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DPL Registration Pass</title>
-    <style>
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            padding: 24px;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #fff4c7, #ff9f67);
-        }
-        .pass {
-            max-width: 1180px;
-            margin: 0 auto;
-            padding: 24px 24px 18px;
-            border-radius: 34px;
-            color: #ffeccc;
-            background:
-                radial-gradient(circle at 18% 18%, rgba(255, 213, 128, 0.24), transparent 18%),
-                radial-gradient(circle at 85% 15%, rgba(255, 181, 72, 0.28), transparent 20%),
-                radial-gradient(circle at 50% 100%, rgba(255, 117, 24, 0.22), transparent 38%),
-                linear-gradient(155deg, #44120e 0%, #6e1c12 28%, #8e2f17 58%, #4f180f 100%);
-            box-shadow: 0 28px 54px rgba(107, 29, 8, 0.32);
-            border: 2px solid rgba(255, 193, 94, 0.45);
-        }
-        .line {
-            height: 6px;
-            margin: 6px 28px 10px;
-            border-radius: 999px;
-            background: linear-gradient(90deg, rgba(255, 198, 114, 0.08), #ffd37f, rgba(255, 198, 114, 0.08));
-        }
-        .top {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            align-items: flex-start;
-            padding: 0 16px;
-        }
-        .brand {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-        .logo {
-            width: 110px;
-            height: 110px;
-            object-fit: contain;
-            background: rgba(62, 13, 7, 0.72);
-            border-radius: 22px;
-            padding: 8px;
-            border: 1px solid rgba(255, 206, 121, 0.35);
-        }
-        .mini {
-            margin: 0 0 6px;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: #ffd67f;
-        }
-        h1 {
-            margin: 0;
-            font-size: 56px;
-            color: #fff6da;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-        }
-        .chip {
-            padding: 14px 18px;
-            border-radius: 18px 18px 18px 42px;
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: #f6ffde;
-            background: linear-gradient(135deg, rgba(148, 50, 14, 0.96), rgba(247, 197, 78, 0.96));
-            border: 1px solid rgba(255, 235, 182, 0.28);
-        }
-        .side {
-            display: grid;
-            gap: 12px;
-            justify-items: end;
-        }
-        .id-stack {
-            min-width: 250px;
-            padding: 14px 16px 12px;
-            border-radius: 20px;
-            background: rgba(66, 18, 10, 0.62);
-            border: 1px solid rgba(255, 204, 120, 0.24);
-        }
-        .id-title {
-            display: block;
-            margin-bottom: 8px;
-            color: #ffd78d;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-        }
-        .barcode {
-            display: flex;
-            align-items: flex-end;
-            gap: 2px;
-            height: 52px;
-            margin-bottom: 8px;
-        }
-        .barcode span {
-            width: 4px;
-            background: #fff5d7;
-            border-radius: 999px;
-        }
-        .id-value {
-            display: block;
-            color: #fff4d8;
-            font-size: 26px;
-            font-weight: 700;
-            letter-spacing: 0.18em;
-        }
-        .stage {
-            display: grid;
-            grid-template-columns: minmax(0, 1.3fr) minmax(240px, 0.75fr);
-            gap: 24px;
-            margin-top: 8px;
-            padding: 10px 16px 0;
-        }
-        .name {
-            margin: 0 0 12px;
-            padding: 0 0 10px;
-            border-bottom: 2px solid rgba(255, 173, 79, 0.65);
-            color: #fff2d4;
-            font-size: 66px;
-            font-weight: 800;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
-        .data-list {
-            display: grid;
-            gap: 8px;
-        }
-        .row {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            align-items: center;
-            padding: 14px 0;
-            border-bottom: 1px solid rgba(255, 172, 85, 0.5);
-        }
-        .row span {
-            min-width: 120px;
-            color: #ffd78d;
-            font-size: 24px;
-        }
-        .row strong {
-            flex: 1;
-            color: #fff4d9;
-            font-size: 26px;
-        }
-        .footer {
-            display: flex;
-            gap: 28px;
-            margin-top: 18px;
-            padding-top: 14px;
-            border-top: 2px solid rgba(255, 171, 78, 0.55);
-        }
-        .footer-item {
-            display: flex;
-            align-items: baseline;
-            gap: 8px;
-            color: #ffd68f;
-            font-size: 30px;
-            font-weight: 700;
-        }
-        .footer-item strong {
-            color: #ffe79a;
-            font-size: 48px;
-        }
-        .map {
-            display: grid;
-            place-items: center;
-        }
-        .map-shape {
-            width: 100%;
-            min-height: 280px;
-            display: grid;
-            place-items: center;
-            padding: 18px;
-            clip-path: polygon(22% 4%, 35% 18%, 62% 8%, 92% 2%, 84% 56%, 73% 90%, 16% 100%, 14% 62%);
-            border: 4px dotted rgba(255, 162, 78, 0.9);
-            background: rgba(255, 240, 210, 0.06);
-        }
-        .map-shape span {
-            color: #ffefc8;
-            font-size: 30px;
-            font-weight: 800;
-        }
-        .note {
-            margin: 18px 0 0;
-            text-align: center;
-            color: #ffd58b;
-            letter-spacing: 0.08em;
-            font-size: 20px;
-            font-weight: 700;
-        }
-        @media (max-width: 900px) {
-            .top,
-            .brand,
-            .side,
-            .stage,
-            .footer,
-            .row {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .stage {
-                grid-template-columns: 1fr;
-            }
-            .chip {
-                width: 100%;
-                text-align: center;
-            }
-            .name {
-                font-size: 42px;
-            }
-        }
-    </style>
 </head>
 <body>
-    <div class="pass">
-        <div class="line"></div>
-        <div class="top">
-            <div class="brand">
-                <img src="${logoSrc}" alt="DPL logo" class="logo">
-                <div>
-                    <p class="mini">DPL Cricket</p>
-                    <h1>Player Pass 2026</h1>
-                </div>
-            </div>
-            <div class="side">
-                <div class="chip">Welcome To Cricket Festival</div>
-                <div class="id-stack">
-                    <span class="id-title">Unique ID</span>
-                    <div class="barcode">${getBarcodePattern(snapshot.id).map((height) => `<span style="height:${height}px"></span>`).join("")}</div>
-                    <strong class="id-value">${snapshot.id}</strong>
-                </div>
-            </div>
-        </div>
-        <div class="stage">
-            <div class="details">
-                <div class="name">${String(snapshot.name).toUpperCase()}</div>
-                <div class="data-list">
-                    <div class="row"><span>Mobile</span><strong>${snapshot.mobile}</strong></div>
-                    <div class="row"><span>Team</span><strong>${snapshot.team}</strong></div>
-                    <div class="row"><span>Role</span><strong>${snapshot.role}</strong></div>
-                </div>
-                <div class="footer">
-                    <div class="footer-item"><span>Jersey:</span><strong>${snapshot.jerseyNumber}</strong></div>
-                </div>
-            </div>
-            <div class="map">
-                <div class="map-shape"><span>Deshgavhan</span></div>
-            </div>
-        </div>
-        <div class="note">VALID FOR DPL CRICKET TOURNAMENT</div>
+    <div>
+        <img src="${logoSrc}" alt="DPL logo">
+        <h1>Player Pass 2026</h1>
+        <p>${snapshot.name}</p>
+        <p>${snapshot.mobile}</p>
+        <p>${snapshot.team}</p>
+        <p>${snapshot.role}</p>
+        <p>${snapshot.jerseyNumber}</p>
     </div>
 </body>
 </html>`;
     const blob = new Blob([html], { type: "text/html;charset=utf-8" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.download = `dpl-registration-pass-${safeName}.html`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+    triggerFileDownload(url, filename);
     URL.revokeObjectURL(url);
 
-    statusMessage.textContent = "HTML pass download started.";
+    statusMessage.textContent = "DPL PDF and HTML pass downloads started.";
     statusMessage.className = "helper-text success";
 }
 

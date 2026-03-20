@@ -234,7 +234,7 @@ h1 {
     overflow: hidden;
     width: min(100%, 960px);
     margin: 0 auto;
-    border-radius: 34px;
+    border-radius: 46px;
     padding: 1.5rem 1.5rem 1.15rem;
     background:
         radial-gradient(circle at 18% 18%, rgba(255, 213, 128, 0.24), transparent 18%),
@@ -249,8 +249,8 @@ h1 {
 .pass-card::before {
     content: "";
     position: absolute;
-    inset: 16px;
-    border-radius: 26px;
+    inset: 18px;
+    border-radius: 34px;
     border: 2px solid rgba(255, 190, 92, 0.42);
     pointer-events: none;
 }
@@ -310,7 +310,7 @@ h1 {
 
 .pass-chip {
     padding: 0.85rem 1.3rem;
-    border-radius: 18px 18px 18px 42px;
+    border-radius: 999px;
     color: #f6ffde;
     font-size: 1.02rem;
     font-weight: 800;
@@ -330,7 +330,7 @@ h1 {
 .pass-id-stack {
     min-width: 250px;
     padding: 0.9rem 1rem 0.8rem;
-    border-radius: 20px;
+    border-radius: 28px;
     background: rgba(66, 18, 10, 0.62);
     border: 1px solid rgba(255, 204, 120, 0.24);
 }
@@ -397,8 +397,10 @@ h1 {
     justify-content: space-between;
     gap: 1rem;
     align-items: center;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid rgba(255, 172, 85, 0.5);
+    padding: 0.9rem 1rem;
+    border-radius: 22px;
+    background: rgba(255, 240, 210, 0.05);
+    border: 1px solid rgba(255, 172, 85, 0.35);
 }
 
 .pass-data-row span {
@@ -440,7 +442,7 @@ h1 {
     display: flex;
     gap: 1.5rem;
     margin-top: 1rem;
-    padding: 0.9rem 0.15rem 0;
+    padding: 1rem 1rem 0;
     border-top: 2px solid rgba(255, 171, 78, 0.55);
 }
 
@@ -654,6 +656,39 @@ h1 {
     border-color: rgba(36, 198, 220, 0.8);
     box-shadow: 0 0 0 4px rgba(36, 198, 220, 0.14);
     transform: translateY(-1px);
+}
+
+.inline-fee-block {
+    margin-top: 1rem;
+}
+
+.fee-preview-card {
+    padding: 1.1rem 1.15rem;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(255, 95, 109, 0.1), rgba(255, 195, 113, 0.18));
+    border: 1px solid rgba(255, 95, 109, 0.16);
+}
+
+.fee-preview-label {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #ff5b3d;
+}
+
+.fee-preview-card strong {
+    display: block;
+    margin: 0.55rem 0 0.45rem;
+    font-size: 1.7rem;
+    color: var(--text);
+}
+
+.fee-preview-note {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.55;
 }
 
 .form-footer {

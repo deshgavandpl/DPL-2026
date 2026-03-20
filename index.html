@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -120,6 +120,19 @@
                                 <span>Age</span>
                                 <input type="number" name="age" id="age" min="10" max="60" placeholder="Enter age" required>
                             </label>
+                            <label class="input-field">
+                                <span>Enter your base price</span>
+                                <input type="number" name="basePrice" id="basePrice" min="0" step="0.01" placeholder="Enter your base price" required>
+                            </label>
+                        </div>
+                        <div class="inline-fee-block">
+                            <p class="field-tag">Registration Fee</p>
+                            <div class="fee-preview-card">
+                                <p class="fee-preview-label">Immediately calculated from your base price</p>
+                                <strong id="calculatedFee">Enter your base price first</strong>
+                                <p class="fee-preview-note">If you enter your base price, the registration fee shown here is 25% of that amount.</p>
+                            </div>
+                            <input type="hidden" name="fee" id="fee" required>
                         </div>
                     </section>
 
@@ -157,25 +170,6 @@
 
                     <section class="form-section">
                         <p class="field-tag">Step 7</p>
-                        <h3>Registration fee</h3>
-                        <div class="choice-grid three-col">
-                            <label class="choice-card">
-                                <input type="radio" name="fee" value="Free" required>
-                                <span>Free</span>
-                            </label>
-                            <label class="choice-card">
-                                <input type="radio" name="fee" value="Rs 10-Rs 20" required>
-                                <span>Rs 10-Rs 20</span>
-                            </label>
-                            <label class="choice-card">
-                                <input type="radio" name="fee" value="More than Rs 50" required>
-                                <span>More than Rs 50</span>
-                            </label>
-                        </div>
-                    </section>
-
-                    <section class="form-section">
-                        <p class="field-tag">Step 8</p>
                         <h3>Remarks</h3>
                         <label class="input-field">
                             <span>Additional notes</span>
@@ -214,7 +208,11 @@
                     <strong id="summaryRole">Not selected</strong>
                 </div>
                 <div class="summary-line">
-                    <span>Fee</span>
+                    <span>Base Price</span>
+                    <strong id="summaryBasePrice">Not entered</strong>
+                </div>
+                <div class="summary-line">
+                    <span>Auction Base Price</span>
                     <strong id="summaryFee">Pending</strong>
                 </div>
             </div>
@@ -249,9 +247,11 @@
                                 <div class="pass-data-row"><span>Mobile</span><strong id="receiptMobile">-</strong></div>
                                 <div class="pass-data-row"><span>Team</span><strong id="receiptTeam">-</strong></div>
                                 <div class="pass-data-row"><span>Role</span><strong id="receiptRole">-</strong></div>
+                                <div class="pass-data-row"><span>Base Price</span><strong id="receiptBasePrice">-</strong></div>
                             </div>
                             <div class="pass-footer-bar">
                                 <div class="pass-footer-item"><span>Jersey:</span><strong id="receiptJerseyNumber">-</strong></div>
+                                <div class="pass-footer-item"><span>Base Price:</span><strong id="receiptFee">-</strong></div>
                             </div>
                         </div>
                         <div class="pass-map">
